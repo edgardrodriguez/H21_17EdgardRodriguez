@@ -1,0 +1,8 @@
+
+Grupo de recurso: 
+learn-bbb4f2af-a8bf-478b-8cf3-3bcdd36f1bc9
+nombre de servidor: 
+sasmen.database.windows.net
+
+usuario: administrador
+Contraseña: Quilmana123
