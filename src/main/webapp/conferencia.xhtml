@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <body>
+
+        <ui:composition template="./index.xhtml">
+
+            <ui:define name="content">
+                <h:head>
+                    <title>CONFERENCIA</title>
+                    <f:event listener="#{actividadControlador.listar()}" type="preRenderView" />
+                </h:head>
+                <h:form id="formConferencia" style="align-content: center;align-items: center;text-align: center">
+                    <h1 style="font-family: sans-serif">PERSONA</h1>
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="NOMBRE DE LA CONFERENCIA" /><p:inputText value="#{actividadControlador.act.nombreConf}"  maxlength="50" required="true" requiredMessage="Rellene el nombre de la conferencia">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="NOMBRE DEL PRIMER CONFERENCISTA" /><p:inputText value="#{actividadControlador.act.primerConf}"  maxlength="40" required="true" requiredMessage="Rellene el nombre del primer conferencista">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="NOMBRE DEL SEGUNDO CONFERENCISTA" /><p:inputText value="#{actividadControlador.act.segundoConf}"  maxlength="40" required="true" requiredMessage="Rellene el nombre del segundo conferencista">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="PRECIO POR CONFERENCIA" /><p:inputText value="#{actividadControlador.act.precioConf}"  required="true" requiredMessage="Rellene el monto por conferencia">
+                            <p:keyFilter regEx="/[0-9]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="DESCRIPCION DE LA CONFERENCIA" /><p:inputText value="#{actividadControlador.act.descripcion}"  maxlength="60" required="true" requiredMessage="Rellene la descripcion">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="FECHA:"/>
+                        <p:calendar id="calFecAct" value="#{actividadControlador.act.fecha}" 
+                                    showOn="button" pattern="dd/MM/yyyy" mask="true" navigator="true"
+                                    size="24"
+                                    required="true" requiredMessage="Rellene la Fecha">
+                        </p:calendar>
+                        <p:outputLabel value="ESTADO"/><p:selectOneRadio value="#{actividadControlador.act.estado}">
+                            <f:selectItem itemLabel="ACTIVO" itemValue="A"/>
+                            <f:selectItem itemLabel="INACTIVO" itemValue="I"/>
+                        </p:selectOneRadio>
+                        <p:commandButton value="Registrar" actionListener="#{actividadControlador.registrar()}" 
+                                             update="formConferencia :formTblConferencia:tblConferencia"/>
+                    </p:panelGrid>
+                </h:form>
+                <br/><br/>
+                <h:form id="formTblConferencia">
+                    <p:dataTable id="tblConferencia"
+                                 var="conf"
+                                 value="#{actividadControlador.listadoActividad}"
+                                 selection="#{actividadControlador.act}"
+                                 selectionMode="single"
+                                 rowKey="#{conf.idConferencia}"
+                                 paginator="true"
+                                 paginatorTemplate=" {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 widgetVar="customersTable">
+                        <f:facet name="header">
+                            <h:commandLink value="Descargar Listado" >
+                                <p:dataExporter type="xls" target="tblConferencia" fileName="Listado"/>
+                            </h:commandLink>
+                        </f:facet>
+                        <p:column headerText="NOMBRE DE LA CONFERENCIA" sortBy="#{conf.nombreConf}" filterBy="#{conf.nombreConf}">
+                            <h:outputText value="#{conf.nombreConf}" />
+                        </p:column>
+                        <p:column headerText="NOMBRE DEL PRIMER CONFERENCISTA" sortBy="#{conf.primerConf}" filterBy="#{conf.primerConf}">
+                            <h:outputText value="#{conf.primerConf}" />
+                        </p:column>
+                        <p:column headerText="NOMBRE DEL SEGUNDO CONFERENCISTA" sortBy="#{conf.segundoConf}" filterBy="#{conf.segundoConf}">
+                            <h:outputText value="#{conf.segundoConf}" />
+                        </p:column>
+                        <p:column headerText="PRECIO POR CONFERENCIA" sortBy="#{conf.precioConf}" filterBy="#{conf.precioConf}">
+                            <h:outputText value="#{conf.precioConf}" />
+                        </p:column>
+                        <p:column headerText="DESCRIPCION DE LA CONFERENCIA" sortBy="#{conf.descripcion}" filterBy="#{conf.descripcion}">
+                            <h:outputText value="#{conf.descripcion}" />
+                        </p:column>
+                        <p:column headerText="FECHA" sortBy="#{conf.fecha}" filterBy="#{conf.fecha}">
+                            <h:outputText value="#{conf.fecha}" />
+                        </p:column>
+                        <p:column headerText="ESTADO" sortBy="#{conf.estado}" filterBy="#{conf.estado}">
+                            <h:outputText value="#{conf.estado}" />
+                        </p:column>
+                        <f:facet name="footer">
+                            EN TOTAL HAY #{fn:length(actividadControlador.listadoActividad)} REGISTROS.
+                        </f:facet>
+                    </p:dataTable>
+                    <p:contextMenu for="tblConferencia">
+                        <p:menuitem value="MODIFICAR" oncomplete="PF('wdlgDatos').show()" update=":formDialog"/>
+                        <p:menuitem value="ELIMINAR" actionListener="#{actividadControlador.eliminar()}" update="tblConferencia"> 
+                            <p:confirm header="CONFIRMACIÓN" message="¿Está seguro de eliminar este registro?"/>
+                        </p:menuitem>
+                    </p:contextMenu>
+                </h:form>
+                <p:dialog header="ACTUALIZAR DATOS" widgetVar="wdlgDatos" resizable="false" modal="true">
+                    <h:form id="formDialog">
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="NOMBRE DE LA CONFERENCIA" /><p:inputText value="#{actividadControlador.act.nombreConf}"  maxlength="50" required="true" requiredMessage="Rellene el nombre de la conferencia">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="NOMBRE DEL PRIMER CONFERENCISTA" /><p:inputText value="#{actividadControlador.act.primerConf}"  maxlength="40" required="true" requiredMessage="Rellene el nombre del primer conferencista">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="NOMBRE DEL SEGUNDO CONFERENCISTA" /><p:inputText value="#{actividadControlador.act.segundoConf}"  maxlength="40" required="true" requiredMessage="Rellene el nombre del segundo conferencista">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="PRECIO POR CONFERENCIA" /><p:inputText value="#{actividadControlador.act.precioConf}"  required="true" requiredMessage="Rellene el monto por conferencia">
+                            <p:keyFilter regEx="/[0-9]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="DESCRIPCION DE LA CONFERENCIA" /><p:inputText value="#{actividadControlador.act.descripcion}"  maxlength="60" required="true" requiredMessage="Rellene la descripcion">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_i_ó_ú]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="FECHA:"/>
+                        <p:calendar id="calFecAct" value="#{actividadControlador.act.fecha}" 
+                                    showOn="button" pattern="dd/MM/yyyy" mask="true" navigator="true"
+                                    size="24"
+                                    required="true" requiredMessage="Rellene la Fecha">
+                        </p:calendar>
+                        <p:outputLabel value="ESTADO"/><p:selectOneRadio value="#{actividadControlador.act.estado}">
+                            <f:selectItem itemLabel="ACTIVO" itemValue="A"/>
+                            <f:selectItem itemLabel="INACTIVO" itemValue="I"/>
+                        </p:selectOneRadio>
+                        <p:commandButton value="MODIFICAR" actionListener="#{actividadControlador.modificar()}" update=":formTblConferencia:tblConferencia" oncomplete="PF('wdlgDatos').hide()"/>
+                            <p:commandButton value="CANCELAR" oncomplete="PF('wdlgDatos').hide()"/>
+                        </p:panelGrid>
+                    </h:form>
+                </p:dialog>
+                <h:form>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="SI" type="button" styleClass="ui-confirmdialog-yes"/>
+                        <p:commandButton value="NO" type="button" styleClass="ui-confirmdialog-no"/>
+                    </p:confirmDialog>
+                </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

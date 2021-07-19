@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <body>
+
+        <ui:composition template="./index.xhtml">
+
+            <ui:define name="content">
+                <h:head>
+                    <title>PAGO</title>
+                    <f:event listener="#{pagoC.listar()}" type="preRenderView" />
+                </h:head>
+                <h:form id="formCuota" style="align-content: center;align-items: center;text-align: center">
+                        <div class="ui-g-2"></div>
+                        <div class="ui-g-10" style="background-color: white;height: 500px">
+                            <h1 style="font-family: sans-serif">CUOTA</h1>
+                            <p:panelGrid columns="2">
+                                <p:outputLabel value="PESONA" />
+                                <p:selectOneMenu value="#{pagoC.cuot.FKpersonaP}">
+                                    <p:ajax event="change" update="ACT" />
+                                    <f:selectItem itemLabel="- Seleccione -"/>
+                                    <f:selectItems value="#{personaC.listadoPer}" var="apo" itemLabel="#{apo.nombre.concat(' ').concat(apo.apellido)}" itemValue="#{apo.ID}"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel value="ACTIVIDAD" />
+                                <p:selectOneMenu id="ACT" value="#{pagoC.cuot.FKconferenciaP}" disabled="#{pagoC.cuot.FKpersonaP lt 1}">
+                                    <p:ajax event="change" update="CuAct MontPa boton" listener="#{pagoC.obtenerCuota()}"/>
+                                    <f:selectItem itemLabel="- Seleccione -"/>
+                                    <f:selectItems value="#{pagoC.listAct}" var="apo" itemLabel="#{apo.nombreConf}" itemValue="#{apo.idConferencia}" />
+                                </p:selectOneMenu>
+
+                                <p:outputLabel value="CANTIDAD A PAGAR POR LA CUOTA"/><p:inputNumber id="CuAct" value="#{pagoC.cuot.cantidadPagar}" maxlength="16" disabled="true"></p:inputNumber>
+                                <p:outputLabel value="MONTO A PAGAR"/><p:inputNumber id="MontPa" value="#{pagoC.cuot.montoPagar}" maxValue="#{pagoC.cuot.cantidadPagar}"/>
+                                <p:outputLabel value="Fecha:"/>
+                                <p:calendar id="german" value="#{pagoC.cuot.fechaPago}" locale="de" navigator="true"
+                                           pattern="yyyy-MMM-dd"/>
+                                <p:commandButton value="Registrar" actionListener="#{pagoC.registrar()}" id="boton" 
+                                                 update="formCuota :formTblCuota:tblCuota" disabled="#{pagoC.cuot.cantidadPagar lt 1}"/> 
+
+                            </p:panelGrid>
+                        </div>
+                    </h:form>
+                <h:form id="formTblCuota">
+                        <div class="ui-g-12" style="background-color: white">
+                            <p:dataTable id="tblCuota"
+                                         var="cuot"
+                                         value="#{pagoC.listadoCuot}"
+                                         selection="#{pagoC.cuot}"
+                                         selectionMode="single"
+                                         rowKey="#{cuot.idPago}"
+                                         paginator="true"
+                                         paginatorTemplate=" {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15">
+                                <f:facet name="header">
+                                    <h:commandLink value="Descargar Listado" >
+                                        <p:dataExporter type="xls" target="tblCuota" fileName="Listado"/>
+                                    </h:commandLink>
+                                </f:facet>
+                                <p:column headerText="NOMBRE" sortBy="#{cuot.personasP}" filterBy="#{cuot.personasP}">
+                                    <h:outputText value="#{cuot.personasP}"/>
+                                </p:column>
+                                <p:column headerText="ACTIVIDAD" sortBy="#{cuot.conferenciaP}" filterBy="#{cuot.conferenciaP}">
+                                    <h:outputText value="#{cuot.conferenciaP}"/>
+                                </p:column>
+                                <p:column headerText="MONTO A PAGAR" >
+                                    <h:outputText value="#{cuot.cantidadPagar}"/>
+                                </p:column>
+                                <p:column headerText="MONTO PAGADO" >
+                                    <h:outputText value="#{cuot.montoPagar}"/>
+                                </p:column>
+                                <p:column headerText="fecha" >
+                                    <h:outputText value="#{cuot.fechaPago}"><f:convertDateTime type="date" pattern="dd - MMM - y"/></h:outputText>
+                                </p:column>
+                                <f:facet name="footer">
+                                    EN TOTAL HAY #{fn:length(pagoC.listadoCuot)} REGISTROS.
+                                </f:facet>
+                            </p:dataTable>
+                            <p:contextMenu for="tblCuota">
+                                <p:menuitem value="MODIFICAR" oncomplete="PF('wdlgDatos').show()" update=":formDialog"/>
+                                <p:menuitem value="ELIMINAR" actionListener="#{pagoC.eliminar()}" update="tblCuota"> 
+                                    <p:confirm header="CONFIRMACIÓN" message="¿Está seguro de eliminar este registro?"/>
+                                </p:menuitem>
+                            </p:contextMenu>
+                        </div>
+                    </h:form>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
